@@ -26,8 +26,10 @@ Two, The PoE switch is rated for 78w of power so roughly 78w/4 = 19.5w per pi. T
 ### Software
 
 - Ubuntu Server 23.0.4 x64 LTS
-- Docker
-- Kubernetes
+- Kubernetes (k3s)
+- Grafana
+- Prometheus
+- Rancher
 
 ## Configuring Ubuntu Servers
 
@@ -46,10 +48,19 @@ List all available storage
 $ sudo fdisk -l
 ```
 
+locate your SSD then create a patition table
+
+```bash
+$ sudo fdisk /dev/sda
+- Press `g` to create a new empty GPT partition table
+- Press `n` to add a new partition (accept default settings)
+- Press `w` to write the changes and exit
+```
+
 Format the SSD partition
 
 ```bash
-$ sudo mkfs.ext4 /dev/sda
+$ sudo mkfs.ext4 /dev/sda1
 ```
 
 Create a mount point
@@ -61,29 +72,41 @@ $ sudo mkdir /mnt/ssd
 Mount the SSD
 
 ```bash
-$ sudo mount /dev/sda /mnt/ssd
+$ sudo mount /dev/sda1 /mnt/ssd
 ```
 
 Update /etf/fstab to make sure the SSD mounts automatically on boot
 
 ```bash
-$ echo "/dev/sda /mnt/ssd ext4 defaults 0 0" | sudo tee -a /etc/fstab
+$ echo "/dev/sda1 /mnt/ssd ext4 defaults 0 0" | sudo tee -a /etc/fstab
 ```
 
-## Setup Docker
+## Setup Kubernetes (K3S)
 
-To setup docker on our pis you will just need to ssh into each pi and run the following commands
+We are going to use the k2s version of kubernetes because it is lightweight, good for edge computing, and much easier to set up. By default k3s uses containerd as a container runtime so no need to install docker unless your building images on the pis or just want to.
 
-Install docker
+Setup the cgroup config for k3s to run
 
 ```bash
-$ sudo apt install -y docker.io
+$ sudo nano /boot/cmdline.txt
+- Add the following
+cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory
 ```
 
-Make sure Docker starts on boot
+Reboot the server for changes to take affect
 
 ```bash
-$ sudo systemctl enable docker
+$ sudo reboot
 ```
 
-## Setup Kubernetes
+Switch to root
+
+```bash
+$ sudo su -
+```
+
+Install k3s on our SSD
+
+```bash
+$ curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE="644" INSTALL_K3S_EXEC="--data-dir /mnt/ssd/k3s" sh -
+```
