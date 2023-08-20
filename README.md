@@ -2,6 +2,8 @@
 
 This is documentation on how I have configured a kubernetes cluster in my raspberry pi homelab. this will be the IoT to run development services in my home lab such as Spark clusters, APIs, and Microservices
 
+![Alt text](image.png)
+
 ## Overview
 
 This homelab consists of 4 raspberry pis one will be designated as the manager service for the kubernetes cluster will the others will be nodes 1-3.
@@ -34,4 +36,20 @@ Configuring Ubuntu Server for pis is pretty straight forward:
 Download the [Raspberry Pi Imager](https://www.raspberrypi.com/software/). Select your flavor of ubuntu server under general OS
 (**Go with a x32 installation if using pi 3 or low ram pi 4**). Select a micro sd to install it on. Then in advanced setting configure ssh. Repeat x4
 
-## Installing Docker
+## Setup Docker
+
+To setup docker on our pis you will just need to ssh into each pi and run the following commands
+
+Install docker
+
+```bash
+$ sudo apt install -y docker.io
+```
+
+Make sure Docker starts on boot
+
+```bash
+$ sudo systemctl enable docker
+```
+
+## Setup Kubernetes
