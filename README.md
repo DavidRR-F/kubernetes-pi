@@ -25,7 +25,7 @@ Two, The PoE switch is rated for 78w of power so roughly 78w/4 = 19.5w per pi. T
 
 ### Software
 
-- Ubuntu Server 23.0.4 x64 LTS
+- Ubuntu Server 22.0.4.3 x64 LTS
 - Kubernetes (k3s)
 - Grafana
 - Prometheus
@@ -37,6 +37,14 @@ Configuring Ubuntu Server for pis is pretty straight forward:
 
 Download the [Raspberry Pi Imager](https://www.raspberrypi.com/software/). Select your flavor of ubuntu server under general OS
 (**Go with a x32 installation if using pi 3 or low ram pi 4**). Select a micro sd to install it on. Then in advanced setting configure ssh. Repeat x3
+
+Make sure to upgrade and reboot the servers
+
+```bash
+$ sudo apt update
+$ sudo apt upgrade -y
+$ sudo reboot
+```
 
 ## Patitioning SSD
 
@@ -108,5 +116,5 @@ $ sudo su -
 Install k3s on our SSD
 
 ```bash
-$ curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE="644" INSTALL_K3S_EXEC="--data-dir /mnt/ssd/k3s" sh -
+$ curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--data-dir /mnt/ssd/k3s" sh -
 ```
