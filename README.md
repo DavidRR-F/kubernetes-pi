@@ -26,10 +26,9 @@ Two, The PoE switch is rated for 78w of power so roughly 78w/4 = 19.5w per pi. T
 ### Software
 
 - Ubuntu Server 22.0.4.3 x64 LTS
-- Kubernetes (k3s)
+- Kubernetes (microK8s)
 - Grafana
 - Prometheus
-- Rancher
 
 ## Configuring Ubuntu Servers
 
@@ -44,6 +43,12 @@ Make sure to upgrade and reboot the servers
 $ sudo apt update
 $ sudo apt upgrade -y
 $ sudo reboot
+```
+
+If you dont set a hostname when installing the image you can do it after with the following command
+
+```bash
+$ sudo hostnamectl set-hostname "my-hostname.local"
 ```
 
 ## Patitioning SSD
@@ -89,7 +94,7 @@ Update /etf/fstab to make sure the SSD mounts automatically on boot
 $ echo "/dev/sda1 /mnt/ssd ext4 defaults 0 0" | sudo tee -a /etc/fstab
 ```
 
-## Setup Kubernetes (K3S)
+## Setup Kubernetes (microK8s)
 
 We are going to use the k2s version of kubernetes because it is lightweight, good for edge computing, and much easier to set up. By default k3s uses containerd as a container runtime so no need to install docker unless your building images on the pis or just want to.
 
@@ -98,7 +103,34 @@ Setup the cgroup config for k3s to run
 ```bash
 $ sudo nano /boot/cmdline.txt
 - Add the following
-cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory
+cgroup_memory=1 cgroup_enable=memory
+```
+
+Kubernetes microK8s is installed using the snap package manager so we will need to install it on the system
+
+```bash
+$ sudo apt install snapd
+```
+
+Add the IPs and hostnames to hosts
+
+```bash
+$ sudo nano /etc/hosts
+- Add in following template
+<IP Address> <Hostname> <Username>
+```
+
+Disable swap
+
+```bash
+$ sudo swapoff -a
+```
+
+And on start up
+
+```bash
+$ sudo nano /etc/fstab
+- comment out the /swap.img line
 ```
 
 Reboot the server for changes to take affect
@@ -107,10 +139,22 @@ Reboot the server for changes to take affect
 $ sudo reboot
 ```
 
-Switch to root
+Install microK8s
 
 ```bash
-$ sudo su -
+$ sudo snap install microk8s --classic
+```
+
+Add Node and copy the join token (For Master Node)
+
+```bash
+$ sudo microk8s.add-node
+```
+
+For worker nodes join them to the cluster
+
+```bash
+$ sudo microk8s join <ip-address>:<port>/<token>
 ```
 
 Install k3s on our SSD
