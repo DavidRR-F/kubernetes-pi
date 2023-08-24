@@ -94,6 +94,63 @@ Update /etf/fstab to make sure the SSD mounts automatically on boot
 $ echo "/dev/sda1 /mnt/ssd ext4 defaults 0 0" | sudo tee -a /etc/fstab
 ```
 
+### Setup Static IP
+
+find ip address
+
+```bash
+$ ip addr show
+- your eth0 subnet
+```
+
+Default Gateway
+
+```bash
+$ ip route | grep default
+```
+
+Routers local DNS
+
+```
+$ cat /etc/resolv.conf
+- next to namespace
+```
+
+or use googles (8.8.8.8, 8.8.4.4) or cloudflare (1.1.1.1)
+
+Backup your netplan config
+
+```bash
+$ sudo cp /etc/netplan/<your-config>.yaml /etc/netplan/<your-config>.yaml.backup
+```
+
+Edit your configuration
+
+```bash
+$ sudo nano /etc/netplan<your-config>.yaml
+```
+
+```yml
+network:
+  version: 2
+  ethernets:
+    eth0:
+      dhcp4: no
+      addresses:
+        - <ip-address>/24
+      routes:
+        - to: default
+          via: <router-local>
+      nameservers:
+        addresses: [<router-local-or-third-party>]
+```
+
+Apply your changes
+
+```bash
+$ sudo netplan apply
+```
+
 ## Setup Kubernetes (microK8s)
 
 We are going to use the k2s version of kubernetes because it is lightweight, good for edge computing, and much easier to set up. By default k3s uses containerd as a container runtime so no need to install docker unless your building images on the pis or just want to.
@@ -118,6 +175,13 @@ Add the IPs and hostnames to hosts
 $ sudo nano /etc/hosts
 - Add in following template
 <IP Address> <Hostname> <Username>
+```
+
+Update your cloud.cfg so ips arent wiped on reboot
+
+```bash
+$ sudo nano /etc/cloud/cloud.cfg
+- comment out update_etc_hosts
 ```
 
 Disable swap
@@ -154,11 +218,5 @@ $ sudo microk8s.add-node
 For worker nodes join them to the cluster
 
 ```bash
-$ sudo microk8s join <ip-address>:<port>/<token>
-```
-
-Install k3s on our SSD
-
-```bash
-$ curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--data-dir /mnt/ssd/k3s" sh -
+$ sudo microk8s join <ip-address>:<port>/<token> --worker
 ```
