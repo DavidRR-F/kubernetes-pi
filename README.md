@@ -94,7 +94,23 @@ Update /etf/fstab to make sure the SSD mounts automatically on boot
 $ echo "/dev/sda1 /mnt/ssd ext4 defaults 0 0" | sudo tee -a /etc/fstab
 ```
 
-### Setup Static IP
+## Setup Static IP
+
+Add IP Addresses of clusters
+
+```bash
+$ sudo nano /etc/hosts
+- Add in following template
+<IP Address> <Hostname> <Username>
+...
+```
+
+Update your cloud.cfg so ips arent wiped on reboot
+
+```bash
+$ sudo nano /etc/cloud/cloud.cfg
+- comment out update_etc_hosts
+```
 
 find ip address
 
@@ -127,7 +143,7 @@ $ sudo cp /etc/netplan/<your-config>.yaml /etc/netplan/<your-config>.yaml.backup
 Edit your configuration
 
 ```bash
-$ sudo nano /etc/netplan<your-config>.yaml
+$ sudo nano /etc/netplan/<your-config>.yaml
 ```
 
 ```yml
@@ -167,21 +183,6 @@ Kubernetes microK8s is installed using the snap package manager so we will need 
 
 ```bash
 $ sudo apt install snapd
-```
-
-Add the IPs and hostnames to hosts
-
-```bash
-$ sudo nano /etc/hosts
-- Add in following template
-<IP Address> <Hostname> <Username>
-```
-
-Update your cloud.cfg so ips arent wiped on reboot
-
-```bash
-$ sudo nano /etc/cloud/cloud.cfg
-- comment out update_etc_hosts
 ```
 
 Disable swap
