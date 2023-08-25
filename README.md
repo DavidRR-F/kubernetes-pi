@@ -232,16 +232,37 @@ node-manager   Ready    <none>   2d    v1.27.4
 node-2         Ready    <none>   62s   v1.27.4
 ```
 
-## Monitoring
-
-Enable dns and hostpath storage
+(Optional) add an alias to microk8s so you can call kubectl and helm the to the same as you would with other kubernetes version
 
 ```bash
-$ microk8s enable dns hostpath-storage
+$ sudo snap alias microk8s.kubectl kubectl
+$ sudo snap alias microk8s.helm3 helm
 ```
 
-Create a namespace for our monitoring applications
+## Monitoring
+
+(Optional) Create a namespace for our monitoring applications
 
 ```bash
 $ microk8s kubectl create namespace monitoring
+```
+
+Enable monitoring addons
+(Enabling multiple addons will be depricated in furture versions)
+
+```bash
+$ microk8s enable dns hostpath-storage prometheus dashboard
+- Observability has been enabled (user/pass: admin/prom-operator)
+```
+
+To view dashboard use the following (If Not RBAC)
+
+```bash
+$ kubectl describe secret -n kube-system microk8s-dashboard-token
+```
+
+Setup a proxy to run in the background on the master node
+
+```bash
+$ microk8s kubectl proxy &
 ```
