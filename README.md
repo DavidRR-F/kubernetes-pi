@@ -221,3 +221,27 @@ For worker nodes join them to the cluster
 ```bash
 $ sudo microk8s join <ip-address>:<port>/<token> --worker
 ```
+
+Check to see if your nodes have been added to the cluster
+
+```bash
+$ sudo microk8s kubectl get nodes
+NAME           STATUS   ROLES    AGE   VERSION
+node-1         Ready    <none>   22h   v1.27.4
+node-manager   Ready    <none>   2d    v1.27.4
+node-2         Ready    <none>   62s   v1.27.4
+```
+
+## Monitoring
+
+Enable dns and hostpath storage
+
+```bash
+$ microk8s enable dns hostpath-storage
+```
+
+Create a namespace for our monitoring applications
+
+```bash
+$ microk8s kubectl create namespace monitoring
+```
