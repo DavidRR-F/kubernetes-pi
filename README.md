@@ -167,6 +167,14 @@ Apply your changes
 $ sudo netplan apply
 ```
 
+On some versions of Ubuntu, the open vswitch service is not installed you will have to install and enable the service to use the netplan command.
+
+```bash
+$ sudo apt-get install --reinstall openvswitch-switch
+$ ls /lib/systemd/system/ovsdb-server.service
+$ sudo systemctl start ovsdb-server
+```
+
 ## Setup Kubernetes (microK8s)
 
 We are going to use the k2s version of kubernetes because it is lightweight, good for edge computing, and much easier to set up. By default k3s uses containerd as a container runtime so no need to install docker unless your building images on the pis or just want to.
